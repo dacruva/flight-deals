@@ -29,7 +29,7 @@ class FlightSearch:
         return response.json()['access_token']
 
     def get_city_code(self, city):
-        cities = f"{self._base_endpoint}/reference-data/locations/cities"
+        cities = f"{self._base_endpoint}/v1/reference-data/locations/cities"
         print(cities)
         print(self._token)
         header = {
@@ -46,3 +46,22 @@ class FlightSearch:
         print(response)
         code = response.json()['data'][0]['iataCode']
         return code
+
+    def search_flight(self, origin_city_code, destination_city_code, initial_date, final_date):
+        search_endpoint = f"{self._base_endpoint}/v2/shopping/flight-offers"
+        header = {
+            "Authorization": f"Bearer {self._token}"
+        }
+        query = {
+            "originLocationCode": origin_city_code,
+            "destinationLocationCode": destination_city_code,
+            "departureDate": initial_date.strftime("%Y-%m-%d"),
+            "returnDate": final_date.strftime("%Y-%m-%d"),
+            "adults": 1,
+            "nonStop": "true",
+            "currencyCode": "USD",
+            "max": "2",
+        }
+        response = requests.get(url=search_endpoint, params=query, headers=header)
+
+        return response.json()
